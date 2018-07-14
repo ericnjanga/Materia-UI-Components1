@@ -3,6 +3,11 @@ import Button from '@material-ui/core/Button';
 
 
 import TextField from '@material-ui/core/TextField';
+
+
+import Icon from '@material-ui/core/Icon';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -16,10 +21,10 @@ import './App.css';
 
 /**
  * 2. Modal:
- * - new button (primary),
- * - "title"
- * - "message" to be shown within the dialog
- * - The modal should be styled as shown in this mockup. 
+ * [DONE] new button (primary),
+ * [DONE] "title"
+ * [DONE] "message" to be shown within the dialog
+ * [DONE] The modal should be styled as shown in this mockup. 
  * 
  * - using Material UI component for the dialog/modal and button, 
  * - but other parts styled for a different UI. 
@@ -27,9 +32,28 @@ import './App.css';
  */
 
 
-const Modal = ({ handleClickOpen, handleClose, isOpen }) => {
+const Modal = ({ title, message, handleClickOpen, handleClose, isOpen }) => {
 
   const styles = {
+    title: {
+      padding: '10px 20px',
+      fontSize: '1rem',
+      backgroundColor: '#F5CE23',
+    },
+    body: {
+      padding: '30px 20px',
+    },
+    footer: {
+      margin: '0',
+      padding: '10px 20px',
+      borderTop: '1px solid #ccc',
+    },
+    btnClose: {
+      position: 'absolute',
+      top: '-6px',
+      right: '0',
+      width: '20px!important',
+    },
     primaryBtn: {
       backgroundColor: '#86bf40',
       color: '#fff',
@@ -44,27 +68,21 @@ const Modal = ({ handleClickOpen, handleClose, isOpen }) => {
           onClose={handleClose}
           aria-labelledby="form-dialog-title"
         >
-          <DialogTitle id="form-dialog-title">Subscribe</DialogTitle>
-          <DialogContent>
+          <DialogTitle id="form-dialog-title" style={styles.title}>
+            {title} 
+
+            <IconButton style={styles.btnClose} onClick={handleClose} aria-label="Close">
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent style={styles.body}>
             <DialogContentText>
-              To subscribe to this website, please enter your email address here. We will send
-              updates occasionally.
+              {message}
             </DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="name"
-              label="Email Address"
-              type="email"
-              fullWidth
-            />
           </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose} color="primary">
-              Cancel
-            </Button>
+          <DialogActions style={styles.footer}> 
             <Button onClick={handleClose} style={styles.primaryBtn}>
-              Subscribe
+              Done
             </Button>
           </DialogActions>
         </Dialog>
@@ -101,25 +119,44 @@ class App extends Component {
 
     const styles = {
       mainContainer: {
-        padding: '3rem',
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%',
+        height: '100vh',
+        justifyContent: 'center',
+        alignItems: 'center',
       },
+    };
+
+
+    const dummyData = {
+      title: 'Custom Modal Title',
+      msg: `Carrot cake halvah brownie fruitcake sesame snaps fruitcake. 
+              Powder cake cake. Muffin chocolate marzipan macaroon gingerbread. 
+              Candy toffee apple pie marshmallow. Cheesecake sweet sweet roll. 
+              Jelly-o danish lollipop pudding tootsie roll brownie jelly. 
+              Cookie tart candy pastry jelly dessert chupa chups sweet roll sweet roll. 
+              Soufflé jujubes bonbon pie. Chocolate cake powder cupcake wafer. 
+              Bear claw cake ice cream jelly beans pie. 
+              Danish pastry bonbon liquorice gummies bear claw. 
+              Danish carrot cake cake donut ice cream croissant gingerbread lollipop bonbon. 
+              Lollipop gingerbread gummi bears donut pie. 
+              Brownie liquorice soufflé bear claw topping marshmallow croissant icing.`
     };
 
     return (
       <div className="App" style={styles.mainContainer}>
 
-        <Modal handleClickOpen={this.handleClickOpen} handleClose={this.handleClose} isOpen={this.state.open} />
-
+        <Modal 
+          title={dummyData.title}
+          message={dummyData.msg}
+          handleClickOpen={this.handleClickOpen}
+          handleClose={this.handleClose}
+          isOpen={this.state.open}
+        />
 
         <Button onClick={this.handleClickOpen}>Open Modal</Button>
 
-        {/* <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p> */}
       </div>
     );
   }
