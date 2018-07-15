@@ -1,164 +1,128 @@
 import React, { Component } from 'react';
+import Modal from './components/modal.js';
 import Button from '@material-ui/core/Button';
-
-
-import TextField from '@material-ui/core/TextField';
-
-
-import Icon from '@material-ui/core/Icon';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-
-
+import { appStyles, dummyData, arrCandidates, DisplayList } from './settings.js';
 import './App.css';
 
 
-
 /**
- * 2. Modal:
- * [DONE] new button (primary),
- * [DONE] "title"
- * [DONE] "message" to be shown within the dialog
- * [DONE] The modal should be styled as shown in this mockup. 
- * 
- * - using Material UI component for the dialog/modal and button, 
- * - but other parts styled for a different UI. 
- * Yellow is #F5CE23.
+ * Main Application:
+ * -----------------
+ * - Control the modal component (on/off)
+ * - Sort incomming array of items
  */
-
-
-const Modal = ({ title, message, handleClickOpen, handleClose, isOpen }) => {
-
-  const styles = {
-    title: {
-      padding: '10px 20px',
-      fontSize: '1rem',
-      backgroundColor: '#F5CE23',
-    },
-    body: {
-      padding: '30px 20px',
-    },
-    footer: {
-      margin: '0',
-      padding: '10px 20px',
-      borderTop: '1px solid #ccc',
-    },
-    btnClose: {
-      position: 'absolute',
-      top: '-6px',
-      right: '0',
-      width: '20px!important',
-    },
-    primaryBtn: {
-      backgroundColor: '#86bf40',
-      color: '#fff',
-      textTransform: 'uppercase',
-    },
-  };
-  
-  return(
-    <div>
-        <Dialog
-          open={isOpen}
-          onClose={handleClose}
-          aria-labelledby="form-dialog-title"
-        >
-          <DialogTitle id="form-dialog-title" style={styles.title}>
-            {title} 
-
-            <IconButton style={styles.btnClose} onClick={handleClose} aria-label="Close">
-              <CloseIcon />
-            </IconButton>
-          </DialogTitle>
-          <DialogContent style={styles.body}>
-            <DialogContentText>
-              {message}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions style={styles.footer}> 
-            <Button onClick={handleClose} style={styles.primaryBtn}>
-              Done
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-
-
-
-
-
-      {/* <Button variant= "contained" color="primary" style={styles.primaryBtn}>
-        Done
-      </Button> */}
-    </div>
-  );
-
-};
 
 
 class App extends Component {
 
-  state = {
-    open: false,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      open: false,
+      candidates: arrCandidates,
+    };
+  }
 
-  handleClickOpen = () => {
+
+  handleModalOpen = () => {
+
     this.setState({ open: true });
+
   };
 
-  handleClose = () => {
+
+  handleModalClose = () => {
+
     this.setState({ open: false });
+
   };
+
+
+  /**
+   * Return an array of the top 10 where responses is 1 or more, 
+   * sorted in descending order by responses, and then by name in ascending order.
+   * @param {*} list 
+   */
+  getTopTen(list, preset) {
+
+    // We need to keep the original array intact
+    const listCopy = [...list];
+
+    // Sort array by number
+    if (preset === 'number') {
+
+      listCopy.sort(function(a, b) {
+        return a[preset] - b[preset];
+      });
+
+    } else {
+
+      // Sort array by name
+      listCopy.sort(function(a, b) {
+        const n1 = a[preset].toLowerCase(),
+              n2 = b[preset].toLowerCase();
+        if (n1 < n2) {
+          return -1;
+        } else if (n1 > n2) {
+          return 1;
+        } else {
+          return 0;
+        } 
+      });
+
+    }
+
+    // Return the first 10 elements of the array
+    return listCopy.slice(0, 10);
+  }
+
+
+  /**
+   * - Sort array of candidates by "name" and by "number"
+   * - Save sort result in the state
+   * (State shouldn't be changed in "componentDidMount" lifecycle function)
+   */
+  onMount = () => {
+
+    const arrTop10Numbers = this.getTopTen(this.state.candidates, 'number');
+    const arrTop10Names = this.getTopTen(this.state.candidates, 'name');
+
+    this.setState({ arrTop10Numbers, arrTop10Names });
+
+  };
+
+
+  /**
+   * Right after the component mount, sort the array by "number" and "name"
+   */
+  componentDidMount() {
+
+    this.onMount();
+
+  }
+
 
   render() {
 
-    const styles = {
-      mainContainer: {
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-        height: '100vh',
-        justifyContent: 'center',
-        alignItems: 'center',
-      },
-    };
-
-
-    const dummyData = {
-      title: 'Custom Modal Title',
-      msg: `Carrot cake halvah brownie fruitcake sesame snaps fruitcake. 
-              Powder cake cake. Muffin chocolate marzipan macaroon gingerbread. 
-              Candy toffee apple pie marshmallow. Cheesecake sweet sweet roll. 
-              Jelly-o danish lollipop pudding tootsie roll brownie jelly. 
-              Cookie tart candy pastry jelly dessert chupa chups sweet roll sweet roll. 
-              Soufflé jujubes bonbon pie. Chocolate cake powder cupcake wafer. 
-              Bear claw cake ice cream jelly beans pie. 
-              Danish pastry bonbon liquorice gummies bear claw. 
-              Danish carrot cake cake donut ice cream croissant gingerbread lollipop bonbon. 
-              Lollipop gingerbread gummi bears donut pie. 
-              Brownie liquorice soufflé bear claw topping marshmallow croissant icing.`
-    };
-
     return (
-      <div className="App" style={styles.mainContainer}>
+      <div className="App" style={appStyles.mainContainer}>
+        <Button variant="contained" color="secondary" onClick={this.handleModalOpen}>Open Modal</Button>
 
+        <div style={{ display: 'flex', marginTop: '20px' }}>
+          <DisplayList list={this.state.arrTop10Names} title={'Top 10 (Sorted By Name)'} />
+      
+          <DisplayList list={this.state.arrTop10Numbers} title={'Top 10 (Sorted By Number)'} />
+        </div>
+        
         <Modal 
           title={dummyData.title}
           message={dummyData.msg}
-          handleClickOpen={this.handleClickOpen}
-          handleClose={this.handleClose}
+          handleClose={this.handleModalClose}
           isOpen={this.state.open}
         />
-
-        <Button onClick={this.handleClickOpen}>Open Modal</Button>
-
       </div>
     );
+
   }
 }
 
